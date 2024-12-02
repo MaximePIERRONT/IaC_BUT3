@@ -215,7 +215,7 @@ resource "local_file" "private_key" {
 resource "google_os_login_ssh_public_key" "ssh_key" {
   project = var.project_id
   user    = data.google_client_openid_userinfo.me.email
-  key     = tls_private_key.ssh.public_key_openssh
+  key     = file("../ansible/ssh/id_ed25519.pub")
 }
 
 # Modification du compte de service existant
@@ -223,17 +223,4 @@ resource "google_project_iam_binding" "service_account_roles" {
   project = var.project_id
   role    = "roles/viewer"
   members = ["serviceAccount:${google_service_account.service_account.email}"]
-}
-
-# Création du répertoire SSH si nécessaire
-resource "null_resource" "ssh_directory" {
-  provisioner "local-exec" {
-    command = "mkdir -p ../ansible/ssh"
-  }
-}
-
-resource "google_project_iam_binding" "os_login_bindings" {
-  project = var.project_id
-  role    = "roles/compute.osLoginAdmin"
-  members = ["user:${data.google_client_openid_userinfo.me.email}"]
 }
