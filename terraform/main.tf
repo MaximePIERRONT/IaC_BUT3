@@ -202,40 +202,40 @@ resource "google_project_iam_binding" "service_account_roles" {
   members = ["serviceAccount:${google_service_account.service_account.email}"]
 }
 
-# Récupération des infos utilisateur
-data "google_client_openid_userinfo" "me" {}
-
-resource "null_resource" "ssh_directory" {
-  provisioner "local-exec" {
-    command = "mkdir -p ../ansible/ssh"
-  }
-}
-
-# Génération de la clé SSH
-resource "tls_private_key" "ssh" {
-  algorithm = "ED25519"
-}
-
-resource "local_file" "private_key" {
-  depends_on = [null_resource.ssh_directory]
-  content    = tls_private_key.ssh.private_key_openssh
-  filename   = "../ansible/ssh/id_ed25519"
-  file_permission = "0600"
-}
-
-resource "local_file" "public_key" {
-  depends_on = [null_resource.ssh_directory]
-  content    = tls_private_key.ssh.public_key_openssh
-  filename   = "../ansible/ssh/id_ed25519.pub"
-  file_permission = "0644"
-}
-
-resource "google_os_login_ssh_public_key" "ssh_key" {
-  depends_on = [local_file.public_key]
-  project    = var.project_id
-  user       = data.google_client_openid_userinfo.me.email
-  key        = tls_private_key.ssh.public_key_openssh
-}
+# # Récupération des infos utilisateur
+# data "google_client_openid_userinfo" "me" {}
+#
+# resource "null_resource" "ssh_directory" {
+#   provisioner "local-exec" {
+#     command = "mkdir -p ../ansible/ssh"
+#   }
+# }
+#
+# # Génération de la clé SSH
+# resource "tls_private_key" "ssh" {
+#   algorithm = "ED25519"
+# }
+#
+# resource "local_file" "private_key" {
+#   depends_on = [null_resource.ssh_directory]
+#   content    = tls_private_key.ssh.private_key_openssh
+#   filename   = "../ansible/ssh/id_ed25519"
+#   file_permission = "0600"
+# }
+#
+# resource "local_file" "public_key" {
+#   depends_on = [null_resource.ssh_directory]
+#   content    = tls_private_key.ssh.public_key_openssh
+#   filename   = "../ansible/ssh/id_ed25519.pub"
+#   file_permission = "0644"
+# }
+#
+# resource "google_os_login_ssh_public_key" "ssh_key" {
+#   depends_on = [local_file.public_key]
+#   project    = var.project_id
+#   user       = data.google_client_openid_userinfo.me.email
+#   key        = tls_private_key.ssh.public_key_openssh
+# }
 
 
 
