@@ -9,31 +9,42 @@
   hosts: frontend
   become: yes
   roles:
-    - nginx
     - frontend
-  tags: ['frontend']
-  
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
 - name: Configure backend servers
   hosts: backend
   become: yes
   roles:
-    - python
     - backend
-  tags: ['backend']
+  tasks:
+    - name: Install python3 and pip
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
 
 - name: Configure database servers
   hosts: database
   become: yes
   roles:
-    - mysql
     - database
-  tags: ['database']
+  tasks:
+    - name: Install MariaDB
+      apt:
+        name: mariadb-server
+        state: present
 
 - name: Configure application
   hosts: all
   become: yes
   tasks:
-    - name: Wait for all services to be up
+    - name: Wait for all services
       wait_for:
         host: "{{ item }}"
         port: "{{ hostvars[item]['service_port'] }}"
@@ -41,7 +52,7 @@
       loop: "{{ groups['all'] }}"
       delegate_to: localhost
       run_once: true
-      
+
     - name: Verify application status
       uri:
         url: "http://{{ hostvars[groups['frontend'][0]]['ansible_host'] }}"
