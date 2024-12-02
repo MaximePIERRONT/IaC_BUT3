@@ -1,0 +1,22 @@
+---
+- name: Create app user
+  user:
+    name: "{{ app_user }}"
+    system: yes
+
+- name: Create app directory
+  file:
+    path: "{{ app_directory }}"
+    state: directory
+    owner: "{{ app_user }}"
+
+- name: Install Python requirements
+  pip:
+    name: "{{ requirements }}"
+    state: present
+
+- name: Deploy Flask application
+  template:
+    src: app.py.j2
+    dest: "{{ app_directory }}/app.py"
+  notify: restart flask

@@ -1,0 +1,10 @@
+server {
+    listen {{ nginx_port }} default_server;
+    root {{ document_root }};
+    
+    location /api/ {
+        proxy_pass http://{{ nginx_backend_host }}:{{ flask_port }}/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

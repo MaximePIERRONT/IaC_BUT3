@@ -1,0 +1,15 @@
+# backend.yml
+---
+packages:
+  - python3-pip
+  - python3-venv
+app_directory: /opt/app
+app_user: app
+app_group: app
+flask_port: 8000
+flask_host: "0.0.0.0"
+requirements:
+  - flask
+  - flask-cors
+  - mysql-connector-python
+

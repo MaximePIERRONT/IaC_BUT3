@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ project_name }}</title>
+</head>
+<body>
+    <h1 id="greeting">Chargement...</h1>
+    <p id="class-info">Chargement de la classe...</p>
+    <script>
+        async function loadData() {
+            try {
+                const [identityResponse, classResponse] = await Promise.all([
+                    fetch('/api/identity'),
+                    fetch('/api/class')
+                ]);
+                // ...
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        loadData();
+    </script>
+</body>
+</html>

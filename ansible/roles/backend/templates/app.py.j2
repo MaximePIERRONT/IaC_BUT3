@@ -1,0 +1,48 @@
+def get_db_connection():
+    return mysql.connector.connect(
+        host='{{ db_host }}',
+        user='{{ db_user }}',
+        password='{{ db_password }}',
+        database='{{ db_name }}'
+    )
+
+@app.route('/api/identity', methods=['GET'])
+def get_identity():
+    return {
+        'prenom': 'John',
+        'nom': 'Doe'
+    }
+
+@app.route('/api/class', methods=['GET'])
+def get_class():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT class_name FROM class_info LIMIT 1')
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if result:
+            return jsonify({'class': result['class_name']})
+        else:
+            return jsonify({'error': 'Classe non trouvée'}), 404
+            
+    except mysql.connector.Error as db_error:
+        app.logger.error(f"Database error: {str(db_error)}")
+        return jsonify({'error': 'Erreur de base de données'}), 500
+    except Exception as e:
+        app.logger.error(f"Server error: {str(e)}")
+        return jsonify({'error': 'Erreur serveur'}), 500
+
+@app.route('/api/healthcheck', methods=['GET'])
+def healthcheck():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return jsonify({'status': 'healthy', 'database': 'connected'})
+    except Exception:
+        return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 500
+
+if __name__ == '__main__':
+    app.run(host='{{ flask_host }}', port={{ flask_port }})

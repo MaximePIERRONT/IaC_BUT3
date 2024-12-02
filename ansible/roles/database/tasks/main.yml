@@ -1,0 +1,28 @@
+---
+- name: Install MariaDB
+  apt:
+    name: mariadb-server
+    state: present
+
+- name: Configure MariaDB
+  template:
+    src: mysql.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+  notify: restart mysql
+
+- name: Create database
+  mysql_db:
+    name: "{{ item.name }}"
+    encoding: "{{ item.encoding }}"
+    collation: "{{ item.collation }}"
+    state: present
+  loop: "{{ mysql_databases }}"
+
+- name: Create database users
+  mysql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+    host: "{{ item.host }}"
+    state: present
+  loop: "{{ mysql_users }}"

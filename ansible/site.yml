@@ -1,0 +1,52 @@
+---
+- name: Apply common configuration
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+- name: Configure frontend servers
+  hosts: frontend
+  become: yes
+  roles:
+    - nginx
+    - frontend
+  tags: ['frontend']
+  
+- name: Configure backend servers
+  hosts: backend
+  become: yes
+  roles:
+    - python
+    - backend
+  tags: ['backend']
+
+- name: Configure database servers
+  hosts: database
+  become: yes
+  roles:
+    - mysql
+    - database
+  tags: ['database']
+
+- name: Configure application
+  hosts: all
+  become: yes
+  tasks:
+    - name: Wait for all services to be up
+      wait_for:
+        host: "{{ item }}"
+        port: "{{ hostvars[item]['service_port'] }}"
+        timeout: 300
+      loop: "{{ groups['all'] }}"
+      delegate_to: localhost
+      run_once: true
+      
+    - name: Verify application status
+      uri:
+        url: "http://{{ hostvars[groups['frontend'][0]]['ansible_host'] }}"
+        return_content: yes
+      register: app_status
+      delegate_to: localhost
+      run_once: true
+      tags: ['verify']

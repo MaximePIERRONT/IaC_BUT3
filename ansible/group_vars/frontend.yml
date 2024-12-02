@@ -1,0 +1,9 @@
+# frontend.yml
+---
+packages:
+  - nginx
+nginx_port: 80
+nginx_server_name: _
+document_root: /var/www/html
+app_user: www-data
+app_group: www-data

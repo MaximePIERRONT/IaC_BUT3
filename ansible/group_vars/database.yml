@@ -1,0 +1,16 @@
+# database.yml
+---
+packages:
+  - mariadb-server
+mysql_port: 3306
+mysql_bind_address: "0.0.0.0"
+mysql_root_password: "{{ vault_mysql_root_password }}"
+mysql_databases:
+  - name: student_db
+    encoding: utf8mb4
+    collation: utf8mb4_unicode_ci
+mysql_users:
+  - name: backend_user
+    password: "{{ vault_backend_db_password }}"
+    priv: "student_db.*:SELECT"
+    host: "10.0.2.%"

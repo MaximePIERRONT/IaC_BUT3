@@ -1,0 +1,24 @@
+all:
+  children:
+    frontend:
+      hosts:
+        frontend-1:
+          ansible_host: ${frontend_public_ip}
+          private_ip: ${frontend_private_ip}
+    
+    backend:
+      hosts:
+        backend-1:
+          ansible_host: ${backend_ip}
+    
+    database:
+      hosts:
+        database-1:
+          ansible_host: ${database_ip}
+  
+  vars:
+    ansible_user: ${ssh_user}
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+    ansible_python_interpreter: /usr/bin/python3
+    backend_server: ${backend_ip}
+    database_server: ${database_ip}
