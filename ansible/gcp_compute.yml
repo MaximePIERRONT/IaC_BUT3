@@ -1,0 +1,16 @@
+plugin: gcp_compute
+zones:
+  - europe-west1-b
+projects:
+  - upec-but3-cloud
+service_account_file: ./service_account.json
+auth_kind: serviceaccount
+keyed_groups:
+  - key: labels
+    prefix: label
+  - key: zone
+    prefix: zone
+hostnames:
+  - name
+compose:
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP

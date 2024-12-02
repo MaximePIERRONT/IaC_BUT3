@@ -114,7 +114,7 @@ resource "google_compute_instance" "frontend" {
   tags = ["frontend", "ssh"]
 
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_pub_key_path)}"
+    enable-oslogin = "TRUE"
   }
 }
 
@@ -137,7 +137,7 @@ resource "google_compute_instance" "backend" {
   tags = ["backend", "ssh"]
 
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_pub_key_path)}"
+    enable-oslogin = "TRUE"
   }
 }
 
@@ -160,7 +160,7 @@ resource "google_compute_instance" "database" {
   tags = ["database", "ssh"]
 
   metadata = {
-    ssh-keys = "${var.ssh_user}:${file(var.ssh_pub_key_path)}"
+    enable-oslogin = "TRUE"
   }
 }
 
@@ -176,4 +176,24 @@ resource "local_file" "ansible_inventory" {
     }
   )
   filename = "../ansible/inventories/gcp.yml"
+}
+
+resource "google_service_account" "service_account" {
+  account_id   = "terraform"
+  display_name = "terraform"
+}
+
+resource "google_project_iam_binding" "service_account_roles" {
+  project = var.project_id
+  role    = "roles/compute.viewer"
+  members = ["serviceAccount:${google_service_account.service_account.email}"]
+}
+
+resource "google_service_account_key" "service_account" {
+  service_account_id = google_service_account.service_account.name
+}
+
+resource "local_file" "service_account" {
+  content  = base64decode(google_service_account_key.service_account.private_key)
+  filename = "../ansible/service_account.json"
 }
