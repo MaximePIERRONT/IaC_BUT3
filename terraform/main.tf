@@ -187,12 +187,6 @@ resource "google_service_account" "service_account" {
   display_name = "terraform"
 }
 
-resource "google_project_iam_binding" "service_account_roles" {
-  project = var.project_id
-  role    = "roles/compute.viewer"
-  members = ["serviceAccount:${google_service_account.service_account.email}"]
-}
-
 resource "google_service_account_key" "service_account" {
   service_account_id = google_service_account.service_account.name
 }
