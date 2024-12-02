@@ -186,36 +186,13 @@ resource "google_service_account" "service_account" {
   account_id   = "terraform"
   display_name = "terraform"
 }
-
 resource "google_service_account_key" "service_account" {
   service_account_id = google_service_account.service_account.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
 }
-
 resource "local_file" "service_account" {
   content  = base64decode(google_service_account_key.service_account.private_key)
-  filename = "../ansible/service_account.json"
-}
-
-# Récupération des infos utilisateur
-data "google_client_openid_userinfo" "me" {}
-
-# Génération de la clé SSH
-resource "tls_private_key" "ssh" {
-  algorithm = "ED25519"
-}
-
-# Sauvegarde de la clé privée
-resource "local_file" "private_key" {
-  content         = tls_private_key.ssh.private_key_openssh
-  filename        = "../ansible/ssh/id_ed25519"
-  file_permission = "0600"
-}
-
-# Configuration OS Login
-resource "google_os_login_ssh_public_key" "ssh_key" {
-  project = var.project_id
-  user    = data.google_client_openid_userinfo.me.email
-  key     = file("../ansible/ssh/id_ed25519.pub")
+  filename = "./service_account.json"
 }
 
 # Modification du compte de service existant
@@ -224,3 +201,41 @@ resource "google_project_iam_binding" "service_account_roles" {
   role    = "roles/viewer"
   members = ["serviceAccount:${google_service_account.service_account.email}"]
 }
+
+# Récupération des infos utilisateur
+data "google_client_openid_userinfo" "me" {}
+
+resource "null_resource" "ssh_directory" {
+  provisioner "local-exec" {
+    command = "mkdir -p ../ansible/ssh"
+  }
+}
+
+# Génération de la clé SSH
+resource "tls_private_key" "ssh" {
+  algorithm = "ED25519"
+}
+
+resource "local_file" "private_key" {
+  depends_on = [null_resource.ssh_directory]
+  content    = tls_private_key.ssh.private_key_openssh
+  filename   = "../ansible/ssh/id_ed25519"
+  file_permission = "0600"
+}
+
+resource "local_file" "public_key" {
+  depends_on = [null_resource.ssh_directory]
+  content    = tls_private_key.ssh.public_key_openssh
+  filename   = "../ansible/ssh/id_ed25519.pub"
+  file_permission = "0644"
+}
+
+resource "google_os_login_ssh_public_key" "ssh_key" {
+  depends_on = [local_file.public_key]
+  project    = var.project_id
+  user       = data.google_client_openid_userinfo.me.email
+  key        = tls_private_key.ssh.public_key_openssh
+}
+
+
+
