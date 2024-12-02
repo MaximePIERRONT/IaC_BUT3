@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 4.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -196,4 +200,40 @@ resource "google_service_account_key" "service_account" {
 resource "local_file" "service_account" {
   content  = base64decode(google_service_account_key.service_account.private_key)
   filename = "../ansible/service_account.json"
+}
+
+# Récupération des infos utilisateur
+data "google_client_openid_userinfo" "me" {}
+
+# Génération de la clé SSH
+resource "tls_private_key" "ssh" {
+  algorithm = "ED25519"
+}
+
+# Sauvegarde de la clé privée
+resource "local_file" "private_key" {
+  content         = tls_private_key.ssh.private_key_openssh
+  filename        = "../ansible/ssh/id_ed25519"
+  file_permission = "0600"
+}
+
+# Configuration OS Login
+resource "google_os_login_ssh_public_key" "ssh_key" {
+  project = var.project_id
+  user    = data.google_client_openid_userinfo.me.email
+  key     = tls_private_key.ssh.public_key_openssh
+}
+
+# Modification du compte de service existant
+resource "google_project_iam_binding" "service_account_roles" {
+  project = var.project_id
+  role    = "roles/viewer"
+  members = ["serviceAccount:${google_service_account.service_account.email}"]
+}
+
+# Création du répertoire SSH si nécessaire
+resource "null_resource" "ssh_directory" {
+  provisioner "local-exec" {
+    command = "mkdir -p ../ansible/ssh"
+  }
 }
