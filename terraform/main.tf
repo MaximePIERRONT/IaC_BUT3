@@ -192,7 +192,7 @@ resource "google_service_account_key" "service_account" {
 }
 resource "local_file" "service_account" {
   content  = base64decode(google_service_account_key.service_account.private_key)
-  filename = "./service_account.json"
+  filename = "../ansible/service_account.json"
 }
 
 # Modification du compte de service existant
