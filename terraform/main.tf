@@ -231,3 +231,9 @@ resource "null_resource" "ssh_directory" {
     command = "mkdir -p ../ansible/ssh"
   }
 }
+
+resource "google_project_iam_binding" "os_login_bindings" {
+  project = var.project_id
+  role    = "roles/compute.osLoginAdmin"
+  members = ["user:${data.google_client_openid_userinfo.me.email}"]
+}
