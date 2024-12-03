@@ -6,6 +6,12 @@ env: production
 ssh_port: 22
 timezone: Europe/Paris
 flask_port: 8000
+
+db_port: 3306
+db_name: student_db
+db_user: backend_user
+db_password: "secure_password"
+
 packages_common:
   - vim
   - curl

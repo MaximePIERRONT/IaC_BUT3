@@ -7,6 +7,7 @@ app_directory: /opt/app
 app_user: app
 app_group: app
 flask_host: "0.0.0.0"
+db_host: "{{ hostvars['database']['networkInterfaces'][0]['networkIP'] }}"
 requirements:
   - flask
   - flask-cors
