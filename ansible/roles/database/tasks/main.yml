@@ -3,7 +3,7 @@
   apt:
     name:
       - mariadb-server
-      - python3-pymysql  # Add this package
+      - python3-pymysql
     state: present
     update_cache: yes
 
