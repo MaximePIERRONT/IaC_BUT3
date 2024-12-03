@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 4.0"
     }
-    tls = {
-      source  = "hashicorp/tls"
-      version = "~> 4.0"
-    }
   }
 }
 
@@ -204,12 +200,13 @@ resource "google_project_iam_binding" "service_account_roles" {
   members = ["serviceAccount:${google_service_account.service_account.email}"]
 }
 
-data "google_client_openid_userinfo" "me" {}
+data "google_client_openid_userinfo" "me" {
+}
 
 resource "google_os_login_ssh_public_key" "add_my_key" {
   project = var.project_id
   user =  data.google_client_openid_userinfo.me.email
-  key = file("~/.ssh/id_rsa.pub")
+  key = file("~/.ssh/id_ed25519.pub")
 }
 
 
