@@ -1,8 +1,11 @@
 ---
-- name: Install MariaDB
+- name: Install MariaDB and dependencies
   apt:
-    name: mariadb-server
+    name:
+      - mariadb-server
+      - python3-pymysql  # Add this package
     state: present
+    update_cache: yes
 
 - name: Configure MariaDB
   template:
