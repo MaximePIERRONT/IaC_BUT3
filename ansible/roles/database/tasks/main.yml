@@ -7,6 +7,22 @@
     state: present
     update_cache: yes
 
+- name: Set MariaDB root password
+  mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
+  no_log: true
+
+- name: Create .my.cnf file for root
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    mode: '0600'
+  become: yes
+
 - name: Configure MariaDB
   template:
     src: mysql.cnf.j2
