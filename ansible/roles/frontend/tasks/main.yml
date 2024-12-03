@@ -1,9 +1,4 @@
 ---
-- name: Debug variables
-  debug:
-    msg: "nginx_port is {{ nginx_port }}"
-  tags: debug
-
 - name: Install Nginx
   apt:
     name: nginx
