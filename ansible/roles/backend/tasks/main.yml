@@ -22,6 +22,7 @@
   pip:
     name: "{{ requirements }}"
     state: present
+  executable: pip3
 
 - name: Deploy Flask application
   template:
