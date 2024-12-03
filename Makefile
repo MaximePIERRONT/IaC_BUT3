@@ -32,7 +32,7 @@ ansible-backend:
 
 ansible-database:
 	ansible-playbook -i $(ANSIBLE_DIR)/inventories/gcp.yml $(ANSIBLE_DIR)/site.yml --tags database
-
+ans
 clean:
 	rm -rf $(TERRAFORM_DIR)/.terraform
 	rm -f $(TERRAFORM_DIR)/terraform.tfstate*
