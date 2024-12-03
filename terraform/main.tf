@@ -164,20 +164,6 @@ resource "google_compute_instance" "database" {
   }
 }
 
-# # Ansible Inventory
-# resource "local_file" "ansible_inventory" {
-#   content = templatefile("${path.module}/templates/inventory.tmpl",
-#     {
-#       frontend_public_ip  = google_compute_instance.frontend.network_interface[0].access_config[0].nat_ip
-#       frontend_private_ip = google_compute_instance.frontend.network_interface[0].network_ip
-#       backend_ip         = google_compute_instance.backend.network_interface[0].network_ip
-#       database_ip        = google_compute_instance.database.network_interface[0].network_ip
-#       ssh_user          = var.ssh_user
-#     }
-#   )
-#   filename = "../ansible/inventories/gcp.yml"
-# }
-
 resource "google_service_account" "service_account" {
   account_id   = "terraform"
   display_name = "terraform"
@@ -207,4 +193,13 @@ resource "google_os_login_ssh_public_key" "add_my_key" {
   project = var.project_id
   user =  data.google_client_openid_userinfo.me.email
   key = file("~/.ssh/id_ed25519.pub")
+}
+
+resource "local_file" "ansible_config" {
+  content = templatefile("${path.module}/templates/ansible.cfg.tpl",
+    {
+      remote_user = data.google_client_openid_userinfo.me.email
+    }
+  )
+  filename = "../ansible/ansible.cfg"
 }
