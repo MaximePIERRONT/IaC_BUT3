@@ -14,7 +14,6 @@
     password: "{{ mysql_root_password }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
     state: present
-  no_log: true
 
 - name: Create .my.cnf file for root
   template:
