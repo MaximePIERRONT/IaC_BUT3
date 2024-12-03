@@ -7,42 +7,39 @@
     state: present
     update_cache: yes
 
-- name: Set MariaDB root password
-  mysql_user:
-    name: root
-    host: localhost
-    password: "{{ mysql_root_password }}"
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    state: present
-
-- name: Create .my.cnf file for root
+- name: Configure MariaDB to listen on all interfaces
   template:
-    src: my.cnf.j2
-    dest: /root/.my.cnf
-    mode: '0600'
-  become: yes
-
-- name: Configure MariaDB
-  template:
-    src: mysql.cnf.j2
+    src: mariadb.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-  notify: restart mysql
+  notify: restart mariadb
 
-- name: Create database
+- name: Create MySQL database
   mysql_db:
-    name: "{{ item.name }}"
-    encoding: "{{ item.encoding }}"
-    collation: "{{ item.collation }}"
+    name: "{{ mysql_databases.name }}"
     state: present
-  loop: "{{ mysql_databases }}"
-  ignore_errors: "{{ ansible_check_mode }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Create database users
+- name: Create class_info table
+  mysql_query:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    query: |
+      CREATE TABLE IF NOT EXISTS {{ mysql_databases.name }}.class_info (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        class_name VARCHAR(50)
+      )
+
+- name: Insert class data
+  mysql_query:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    query: >
+      INSERT INTO {{ mysql_databases.name }}.class_info (class_name)
+      VALUES ('{{ class_name }}')
+
+- name: Create backend user
   mysql_user:
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
-    priv: "{{ item.priv }}"
-    host: "{{ item.host }}"
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    host: "{{ mysql_users.host }}"
+    priv: "{{ mysql_databases.name }}.*:SELECT"
     state: present
-  loop: "{{ mysql_users }}"
-  ignore_errors: "{{ ansible_check_mode }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock

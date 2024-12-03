@@ -14,3 +14,5 @@ mysql_users:
     password: "password"
     priv: "student_db.*:SELECT"
     host: "10.0.2.%"
+
+class_name: "BUT3 Virtualisation"

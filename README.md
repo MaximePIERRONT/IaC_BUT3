@@ -32,6 +32,7 @@ ssh-add ~/.ssh/id_ed25519
 sudo apt install terraform`
 
 sudo apt install ansible
+ansible-galaxy collection install community.mysql
 sudo apt install -y python3-google-auth python3-requests python3-google-auth-httplib2 python3-googleapi
 
 ![img.png](img.png)
