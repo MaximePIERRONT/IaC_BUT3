@@ -23,6 +23,7 @@
     name: "{{ requirements }}"
     state: present
     executable: pip3
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Deploy Flask application
   template:
