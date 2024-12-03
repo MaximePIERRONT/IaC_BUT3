@@ -8,6 +8,8 @@
 - name: Configure frontend servers
   hosts: frontend
   become: yes
+  vars_files:
+    - group_vars/frontend.yml
   roles:
     - frontend
   tasks:
