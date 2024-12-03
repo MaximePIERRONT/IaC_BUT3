@@ -1,7 +1,8 @@
 ---
-- name: restart flask
+- name: start flask
   systemd:
-    name: flask
+    name: flask-app
     state: restarted
     daemon_reload: yes
+  become: yes
   ignore_errors: "{{ ansible_check_mode }}"
