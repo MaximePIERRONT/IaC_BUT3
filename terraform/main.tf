@@ -168,28 +168,30 @@ resource "google_compute_instance" "database" {
   }
 }
 
-# Ansible Inventory
-resource "local_file" "ansible_inventory" {
-  content = templatefile("${path.module}/templates/inventory.tmpl",
-    {
-      frontend_public_ip  = google_compute_instance.frontend.network_interface[0].access_config[0].nat_ip
-      frontend_private_ip = google_compute_instance.frontend.network_interface[0].network_ip
-      backend_ip         = google_compute_instance.backend.network_interface[0].network_ip
-      database_ip        = google_compute_instance.database.network_interface[0].network_ip
-      ssh_user          = var.ssh_user
-    }
-  )
-  filename = "../ansible/inventories/gcp.yml"
-}
+# # Ansible Inventory
+# resource "local_file" "ansible_inventory" {
+#   content = templatefile("${path.module}/templates/inventory.tmpl",
+#     {
+#       frontend_public_ip  = google_compute_instance.frontend.network_interface[0].access_config[0].nat_ip
+#       frontend_private_ip = google_compute_instance.frontend.network_interface[0].network_ip
+#       backend_ip         = google_compute_instance.backend.network_interface[0].network_ip
+#       database_ip        = google_compute_instance.database.network_interface[0].network_ip
+#       ssh_user          = var.ssh_user
+#     }
+#   )
+#   filename = "../ansible/inventories/gcp.yml"
+# }
 
 resource "google_service_account" "service_account" {
   account_id   = "terraform"
   display_name = "terraform"
 }
+
 resource "google_service_account_key" "service_account" {
   service_account_id = google_service_account.service_account.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
+
 resource "local_file" "service_account" {
   content  = base64decode(google_service_account_key.service_account.private_key)
   filename = "../ansible/service_account.json"
@@ -202,8 +204,16 @@ resource "google_project_iam_binding" "service_account_roles" {
   members = ["serviceAccount:${google_service_account.service_account.email}"]
 }
 
+data "google_client_openid_userinfo" "me" {}
+
+resource "google_os_login_ssh_public_key" "add_my_key" {
+  project = var.gcp_project
+  user =  data.google_client_openid_userinfo.me.email
+  key = file("~/.ssh/id_rsa.pub")
+}
+
+
 # # Récupération des infos utilisateur
-# data "google_client_openid_userinfo" "me" {}
 #
 # resource "null_resource" "ssh_directory" {
 #   provisioner "local-exec" {
@@ -230,12 +240,6 @@ resource "google_project_iam_binding" "service_account_roles" {
 #   file_permission = "0644"
 # }
 #
-# resource "google_os_login_ssh_public_key" "ssh_key" {
-#   depends_on = [local_file.public_key]
-#   project    = var.project_id
-#   user       = data.google_client_openid_userinfo.me.email
-#   key        = tls_private_key.ssh.public_key_openssh
-# }
 
 
 

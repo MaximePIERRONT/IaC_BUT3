@@ -51,14 +51,14 @@ variable "ssh_source_ranges" {
   default     = "0.0.0.0/0"
 }
 
-variable "ssh_user" {
-  description = "SSH user for instances"
-  type        = string
-  default     = "admin"
-}
-
-variable "ssh_pub_key_path" {
-  description = "Path to SSH public key file"
-  type        = string
-  default     = "~/.ssh/id_rsa.pub"
-}
+# variable "ssh_user" {
+#   description = "SSH user for instances"
+#   type        = string
+#   default     = "admin"
+# }
+#
+# variable "ssh_pub_key_path" {
+#   description = "Path to SSH public key file"
+#   type        = string
+#   default     = "~/.ssh/id_rsa.pub"
+# }
