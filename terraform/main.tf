@@ -136,6 +136,7 @@ resource "google_compute_instance" "backend" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.backend.id
+    access_config {}
   }
 
   tags = ["backend", "ssh"]
@@ -163,6 +164,7 @@ resource "google_compute_instance" "database" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.database.id
+    access_config {}
   }
 
   tags = ["database", "ssh"]
