@@ -113,6 +113,10 @@ resource "google_compute_instance" "frontend" {
 
   tags = ["frontend", "ssh"]
 
+  labels = {
+    environment = "dev"
+  }
+
   metadata = {
     enable-oslogin = "TRUE"
   }
@@ -136,6 +140,10 @@ resource "google_compute_instance" "backend" {
 
   tags = ["backend", "ssh"]
 
+  labels = {
+    environment = "dev"
+  }
+
   metadata = {
     enable-oslogin = "TRUE"
   }
@@ -158,6 +166,10 @@ resource "google_compute_instance" "database" {
   }
 
   tags = ["database", "ssh"]
+
+  labels = {
+    environment = "dev"
+  }
 
   metadata = {
     enable-oslogin = "TRUE"
