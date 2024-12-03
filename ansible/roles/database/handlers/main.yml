@@ -1,0 +1,6 @@
+---
+- name: restart mysql
+  service:
+    name: mysql
+    state: restarted
+  ignore_errors: "{{ ansible_check_mode }}"
