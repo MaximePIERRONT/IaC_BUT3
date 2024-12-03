@@ -25,7 +25,7 @@ variable "zone" {
 variable "instance_type" {
   description = "Instance type"
   type        = string
-  default     = "e2-micro"
+  default     = "e2-medium"
 }
 
 variable "frontend_cidr" {
