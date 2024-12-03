@@ -11,4 +11,5 @@ requirements:
   - flask
   - flask-cors
   - mysql-connector-python
+  - requests
 
