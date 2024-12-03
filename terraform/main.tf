@@ -207,7 +207,7 @@ resource "google_project_iam_binding" "service_account_roles" {
 data "google_client_openid_userinfo" "me" {}
 
 resource "google_os_login_ssh_public_key" "add_my_key" {
-  project = var.gcp_project
+  project = var.project_id
   user =  data.google_client_openid_userinfo.me.email
   key = file("~/.ssh/id_rsa.pub")
 }
