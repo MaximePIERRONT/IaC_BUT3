@@ -1,6 +1,7 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
+  default     = "upec-but3-cloud"
 }
 
 variable "project_name" {

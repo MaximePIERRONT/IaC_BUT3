@@ -43,6 +43,8 @@ sudo apt install -y python3-google-auth python3-requests python3-google-auth-htt
 
 
 cd terraform
+
+change default variables in variables.tf
 terraform init
 terraform plan
 
