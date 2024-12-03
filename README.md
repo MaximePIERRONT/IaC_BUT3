@@ -9,6 +9,9 @@ sudo apt install git
 ssh-keygen -t rsa -f ~/.ssh/id_ed25519 -C <john_doe_gmail_com>
 replace "." & "@" with "_"
 
+eval `ssh-agent`
+ssh-add ~/.ssh/id_ed25519
+
 
 
 
@@ -51,4 +54,16 @@ terraform plan
 verfier l'inventory
 
 ansible-inventory --list
+
+
+```bash
+ansible -m ping label_environment_dev
+frontend | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/libexec/platform-python"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
 
