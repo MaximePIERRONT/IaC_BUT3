@@ -1,7 +1,9 @@
----
+# site.yml
 - name: Apply common configuration
   hosts: all
   become: yes
+  vars_files:
+    - group_vars/all.yml
   roles:
     - common
 
@@ -21,6 +23,8 @@
 - name: Configure backend servers
   hosts: backend
   become: yes
+  vars_files:
+    - group_vars/backend.yml
   roles:
     - backend
   tasks:
@@ -34,6 +38,8 @@
 - name: Configure database servers
   hosts: database
   become: yes
+  vars_files:
+    - group_vars/database.yml
   roles:
     - database
   tasks:
@@ -41,25 +47,3 @@
       apt:
         name: mariadb-server
         state: present
-
-- name: Configure application
-  hosts: all
-  become: yes
-  tasks:
-    - name: Wait for all services
-      wait_for:
-        host: "{{ item }}"
-        port: "{{ hostvars[item]['service_port'] }}"
-        timeout: 300
-      loop: "{{ groups['all'] }}"
-      delegate_to: localhost
-      run_once: true
-
-    - name: Verify application status
-      uri:
-        url: "http://{{ hostvars[groups['frontend'][0]]['ansible_host'] }}"
-        return_content: yes
-      register: app_status
-      delegate_to: localhost
-      run_once: true
-      tags: ['verify']
