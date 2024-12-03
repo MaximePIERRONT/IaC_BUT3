@@ -20,6 +20,7 @@
     collation: "{{ item.collation }}"
     state: present
   loop: "{{ mysql_databases }}"
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create database users
   mysql_user:
@@ -29,3 +30,4 @@
     host: "{{ item.host }}"
     state: present
   loop: "{{ mysql_users }}"
+  ignore_errors: "{{ ansible_check_mode }}"
